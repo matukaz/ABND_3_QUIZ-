@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">ABND_3_QUIZ_APP</string>
+    <string name="submit">submit</string>
+    <string name="next_question">Next Question</string>
+    <string name="question_nr">Question nr: %s</string>
 </resources>
