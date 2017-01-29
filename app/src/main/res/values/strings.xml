@@ -2,5 +2,10 @@
     <string name="app_name">ABND_3_QUIZ_APP</string>
     <string name="submit">submit</string>
     <string name="next_question">Next Question</string>
-    <string name="question_nr">Question nr: %s</string>
+    <string name="thanks_for_playing">Thanks for playing,\n%1s</string>
+    <string name="answer_correct">Answer was correct!</string>
+    <string name="answer_incorrect">Answer was incorrect!</string>
+    <string name="quiz_app">Quiz App</string>
+    <string name="what_is_your_name">What is your name?</string>
+    <string name="name">Name</string>
 </resources>

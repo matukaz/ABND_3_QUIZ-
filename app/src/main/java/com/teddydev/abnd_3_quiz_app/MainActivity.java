@@ -8,20 +8,28 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.teddydev.abnd_3_quiz_app.Model.MultipleAnswer;
+import com.teddydev.abnd_3_quiz_app.Model.Questions;
+import com.teddydev.abnd_3_quiz_app.Model.SingleAnswer;
+import com.teddydev.abnd_3_quiz_app.Util.Util;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
-
-    boolean rightAnswer = false;
-    ArrayList<SingleAnswer> questions = new ArrayList<>();
+    ArrayList<Questions> answerQuestionList = new ArrayList<>();
+    private ArrayList<Integer> listOfAnswers = new ArrayList<>();
+    private Questions question;
     private RelativeLayout nameLayout;
     private EditText nameEditText;
     private String userName;
@@ -41,12 +49,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                userName = nameEditText.getText().toString();
-                nameLayout.setVisibility(View.GONE);
-                Util.hideKeyboard(MainActivity.this);
-                submitButton.setVisible(true);
-                nextQuestion();
-                return true;
+                if (nameEditText.getText().toString().trim().equalsIgnoreCase("")) {
+                    nameEditText.setError("This field can not be blank");
+                    Util.showKeyboard(MainActivity.this);
+                } else {
+                    userName = nameEditText.getText().toString();
+                    nameLayout.setVisibility(View.GONE);
+                    Util.hideKeyboard(MainActivity.this);
+                    submitButton.setVisible(true);
+                    nextQuestion();
+                    return true;
+                }
             }
             return false;
         }
@@ -62,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         nameEditText = (EditText) findViewById(R.id.name_edittext);
         nameEditText.setOnEditorActionListener(onNameEditorActionListener);
         createQuestions();
-
 
         if (savedInstanceState != null) {
             //TODO so that layout won't reset from portrait to landscape
@@ -86,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_submit:
-                //TODO submit method
                 gradeAnswer();
                 return true;
             default:
@@ -103,17 +114,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gradeAnswer() {
-        int correctAnswer = questions.get(questionNr - 1).getCorrectAnswer();
+        boolean correctAnswer = false;
 
-        if (correctAnswer == checkedRadioButtonId) {
-            rightAnswer = true;
-        } else {
-            rightAnswer = false;
+        if (question instanceof SingleAnswer) {
+            correctAnswer = question.isCorrectAnswer(new ArrayList<>(Arrays.asList(checkedRadioButtonId)));
+        } else if (question instanceof MultipleAnswer) {
+            correctAnswer = question.isCorrectAnswer(listOfAnswers);
         }
+        showResult(correctAnswer);
+    }
+
+    private void showResult(boolean correctAnswer) {
+        String showResultMessage = "";
         if (toast != null) {
             toast.cancel();
         }
-        toast = Toast.makeText(this, "" + rightAnswer, Toast.LENGTH_SHORT);
+        if (correctAnswer) {
+            showResultMessage += getString(R.string.answer_correct);
+
+        } else {
+            showResultMessage += getString(R.string.answer_incorrect);
+        }
+        toast = Toast.makeText(this, showResultMessage, Toast.LENGTH_SHORT);
         toast.show();
     }
 
@@ -122,45 +144,94 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void nextQuestion() {
-        generateSingleAnswerQuestion(questionNr);
-        questionNr += 1;
+        if (answerQuestionList.size() > questionNr) {
+            question = answerQuestionList.get(questionNr);
+
+            if (question instanceof SingleAnswer) {
+                generateSingleAnswerQuestion(question);
+            } else if (question instanceof MultipleAnswer) {
+                generateMultipleAnswerQuestion(question);
+            }
+            questionNr += 1;
+        } else {
+            showEndScreen();
+        }
     }
 
-    private void generateSingleAnswerQuestion(int whichQuestionFromArray) {
-        setContentView(R.layout.single_answer_quiz_layout);
-        radioGroup = (RadioGroup) findViewById(R.id.radiogroup);
-        TextView questionText = (TextView) findViewById(R.id.question_textview);
-        questionText.setText(questions.get(whichQuestionFromArray).getQuestion());
+    private void showEndScreen() {
+        setContentView(R.layout.end_layout);
+        TextView endScreenText = (TextView) findViewById(R.id.end_screen_textview);
+        endScreenText.setText(getString(R.string.thanks_for_playing, userName));
+        submitButton.setVisible(false);
+    }
 
-        int ids = 1;
-        radioGroup.setOrientation(RadioGroup.VERTICAL);
-        // create radio buttons
-        for (String question : questions.get(whichQuestionFromArray).getQuestions()) {
-            RadioButton radioButton = new RadioButton(this);
-            radioButton.setText(question);
-            radioButton.setTag(ids);
-            radioButton.setId(ids);
-            radioGroup.addView(radioButton);
-            ids += 1;
-        }
 
-        // This overrides the radiogroup onCheckListener
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // This will get the radiobutton that has changed in its check state
-                RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
-                // If the radiobutton that has changed in check state is now checked...
-                if (checkedRadioButton.isChecked()) {
-                    checkedRadioButtonId = (int) checkedRadioButton.getTag();
-                }
+    private void generateMultipleAnswerQuestion(Questions question) {
+        listOfAnswers.clear();
+        if (answerQuestionList != null) {
+            setContentView(R.layout.multiple_answer_quiz_layout);
+            LinearLayout checkBoxGroupLayout = (LinearLayout) findViewById(R.id.checkboxgroup);
+            TextView questionText = (TextView) findViewById(R.id.question_textview);
+            questionText.setText(question.getQuestion());
+
+            int ids = 1;
+            for (String questions : question.getQuestions()) {
+                CheckBox checkBox = new CheckBox(this);
+                checkBox.setText(questions);
+                checkBox.setTag(ids);
+                checkBoxGroupLayout.addView(checkBox);
+                ids += 1;
+                checkBox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                        if (isChecked) {
+                            listOfAnswers.add((int) compoundButton.getTag());
+                        } else {
+                            listOfAnswers.remove(compoundButton.getTag());
+                        }
+                    }
+                });
             }
-        });
+        }
+    }
+
+    private void generateSingleAnswerQuestion(Questions question) {
+        if (answerQuestionList != null) {
+            setContentView(R.layout.single_answer_quiz_layout);
+            radioGroup = (RadioGroup) findViewById(R.id.radiogroup);
+            TextView questionText = (TextView) findViewById(R.id.question_textview);
+            questionText.setText(question.getQuestion());
+
+            int ids = 1;
+            radioGroup.setOrientation(RadioGroup.VERTICAL);
+            // create radio buttons
+            for (String questions : question.getQuestions()) {
+                RadioButton radioButton = new RadioButton(this);
+                radioButton.setText(questions);
+                radioButton.setTag(ids);
+                radioGroup.addView(radioButton);
+                ids += 1;
+            }
+
+            // This overrides the radiogroup onCheckListener
+            radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    // This will get the radiobutton that has changed in its check state
+                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    // If the radiobutton that has changed in check state is now checked...
+                    if (checkedRadioButton.isChecked()) {
+                        checkedRadioButtonId = (int) checkedRadioButton.getTag();
+                    }
+                }
+            });
+        }
     }
 
     private void createQuestions() {
-        questions.add(new SingleAnswer(1, "What year Android came out?", new ArrayList<>(Arrays.asList("2015", "2014", "2013"))));
-        questions.add(new SingleAnswer(2, "What year Java came out?", new ArrayList<>(Arrays.asList("1999", "2014", "2013"))));
-        questions.add(new SingleAnswer(3, "What year Java came out?", new ArrayList<>(Arrays.asList("1999", "2014", "2013"))));
-    }
+        answerQuestionList.add(new SingleAnswer(1, "What year Android came out?", new ArrayList<>(Arrays.asList("2015", "2014", "2013"))));
+        answerQuestionList.add(new SingleAnswer(2, "What year Java came out?", new ArrayList<>(Arrays.asList("1999", "2014", "2013"))));
+        answerQuestionList.add(new SingleAnswer(3, "What year Java came out WUT IS WRONG WITH U????", new ArrayList<>(Arrays.asList("1999", "2014", "2013"))));
+        answerQuestionList.add(new MultipleAnswer(new ArrayList<>(Arrays.asList(1, 2)), "TEST QUESTION", new ArrayList<>(Arrays.asList("1999", "2014", "2013"))));
 
+    }
 }

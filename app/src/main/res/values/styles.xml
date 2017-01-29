@@ -8,4 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="textview_sytle">
+        <item name="android:textColor">@color/colorTextView</item>
+    </style>
 </resources>

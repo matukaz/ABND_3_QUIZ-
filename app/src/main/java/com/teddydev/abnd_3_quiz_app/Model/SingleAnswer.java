@@ -1,8 +1,8 @@
-package com.teddydev.abnd_3_quiz_app;
+package com.teddydev.abnd_3_quiz_app.Model;
 
 import java.util.ArrayList;
 
-public class SingleAnswer {
+public class SingleAnswer implements Questions {
 
     private int correctAnswer;
     private String question;
@@ -22,7 +22,7 @@ public class SingleAnswer {
         this.question = question;
     }
 
-    public int getCorrectAnswer() {
+    public int isCorrectAnswer() {
         return correctAnswer;
     }
 
@@ -42,7 +42,12 @@ public class SingleAnswer {
     public String toString() {
         return "SingleAnswer{" +
                 ", correctAnswer=" + correctAnswer +
-                ", questions=" + questions +
+                ", answerQuestionList=" + questions +
                 '}';
+    }
+
+    @Override
+    public boolean isCorrectAnswer(ArrayList<Integer> answers) {
+        return answers.get(0) == correctAnswer;
     }
 }
