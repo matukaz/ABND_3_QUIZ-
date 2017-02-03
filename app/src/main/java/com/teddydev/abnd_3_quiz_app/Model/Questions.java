@@ -6,10 +6,12 @@ import java.util.ArrayList;
  * Created by Matu on 29.01.2017.
  */
 
-public interface Questions {
-    ArrayList<String> getQuestions();
+public abstract class Questions {
+    public abstract ArrayList<String> getQuestions();
 
-    String getQuestion();
+    public abstract String getQuestion();
 
-    boolean isCorrectAnswer(ArrayList<Integer> answers);
+    public abstract boolean isCorrectAnswer(ArrayList<Integer> answers);
+
+    public abstract boolean isCorrectAnswer(String answer);
 }

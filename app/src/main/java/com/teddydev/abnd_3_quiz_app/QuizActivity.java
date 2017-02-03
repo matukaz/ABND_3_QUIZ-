@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.teddydev.abnd_3_quiz_app.Model.MultipleAnswer;
 import com.teddydev.abnd_3_quiz_app.Model.Questions;
 import com.teddydev.abnd_3_quiz_app.Model.SingleAnswer;
+import com.teddydev.abnd_3_quiz_app.Model.TextAnswer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,5 +162,7 @@ public class QuizActivity extends AppCompatActivity  {
         answerQuestionList.add(new SingleAnswer(2, "What year Java was released?", new ArrayList<>(Arrays.asList("1999", "1995", "1991"))));
         answerQuestionList.add(new SingleAnswer(1, "When did c++ first appear", new ArrayList<>(Arrays.asList("1983", "1985", "1989"))));
         answerQuestionList.add(new MultipleAnswer(new ArrayList<>(Arrays.asList(2, 3)), "Which of these languages are FUNCTION languages", new ArrayList<>(Arrays.asList("Java", "Erlang", "F#"))));
+
+        answerQuestionList.add(new TextAnswer("Nougat", "What was Android 7.1 version called? (Code name)"));
     }
 }

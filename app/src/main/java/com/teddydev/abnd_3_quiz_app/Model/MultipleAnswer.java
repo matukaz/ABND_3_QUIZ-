@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Created by Matu on 29.01.2017.
  */
-public class MultipleAnswer implements Questions {
+public class MultipleAnswer extends Questions {
 
     private ArrayList<Integer> correctAnswersList;
     private String question;
@@ -66,5 +66,10 @@ public class MultipleAnswer implements Questions {
             }
         }
         return numberOfCorrectAnswers == correctAnswersList.size();
+    }
+
+    @Override
+    public boolean isCorrectAnswer(String answer) {
+        return false;
     }
 }
