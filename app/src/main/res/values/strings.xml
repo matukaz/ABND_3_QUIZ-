@@ -9,4 +9,5 @@
     <string name="what_is_your_name">What is your name?</string>
     <string name="name">Name</string>
     <string name="write_answer_here">Write answer here...</string>
+    <string name="toast_show_total_number_of_correct_answers">%1$d/%2$d </string>
 </resources>
