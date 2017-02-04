@@ -2,7 +2,7 @@ package com.teddydev.abnd_3_quiz_app.Model;
 
 import java.util.ArrayList;
 
-public class SingleAnswer implements Questions {
+public class SingleAnswer extends Questions {
 
     private int correctAnswer;
     private String question;
@@ -49,5 +49,10 @@ public class SingleAnswer implements Questions {
     @Override
     public boolean isCorrectAnswer(ArrayList<Integer> answers) {
         return answers.get(0) == correctAnswer;
+    }
+
+    @Override
+    public boolean isCorrectAnswer(String answer) {
+        return false;
     }
 }
