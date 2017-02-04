@@ -17,12 +17,12 @@ public class TextAnswer extends Questions {
 
     @Override
     public ArrayList<String> getQuestions() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isCorrectAnswer(ArrayList<Integer> answers) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -31,7 +31,7 @@ public class TextAnswer extends Questions {
     }
 
     @Override
-    public boolean isCorrectAnswer(String answer) {
-        return answer != null && answer.equalsIgnoreCase(answer);
+    public boolean isCorrectAnswer(String guessedAnswer) {
+        return guessedAnswer != null && answer.equalsIgnoreCase(guessedAnswer);
     }
 }
